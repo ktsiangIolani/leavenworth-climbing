@@ -35,10 +35,9 @@ export function NewPostModal({ open, onClose }: NewPostModalProps) {
   const handleSubmit = async () => {
     if (!comment.trim()) return
     setSubmitting(true)
-    await new Promise(r => setTimeout(r, 300))
     const resolvedName = useCustomRoute ? customRoute || routeName : routeName
     const resolvedGrade = LEAVENWORTH_ROUTES.find(r => r.name === resolvedName)?.grade ?? ''
-    addPost({
+    await addPost({
       authorName,
       routeName: resolvedName,
       grade: resolvedGrade,

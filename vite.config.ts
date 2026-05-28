@@ -6,6 +6,12 @@ export default defineConfig({
   base: '/leavenworth-climbing/',
   server: {
     port: 3001,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3002',
+        changeOrigin: true,
+      },
+    },
   },
   build: {
     rollupOptions: {
