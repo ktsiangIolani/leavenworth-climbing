@@ -12,13 +12,6 @@ interface NewPostModalProps {
   onClose: () => void
 }
 
-const GRADES = [
-  'V0','V1','V2','V3','V4','V5','V6','V7',
-  '5.6','5.7','5.8','5.9','5.9+',
-  '5.10a','5.10b','5.10c','5.10d',
-  '5.11a','5.11b','5.11c','5.11d',
-]
-
 export function NewPostModal({ open, onClose }: NewPostModalProps) {
   const { addPost } = useSocialFeed()
   const fileRef = useRef<HTMLInputElement>(null)
@@ -27,7 +20,6 @@ export function NewPostModal({ open, onClose }: NewPostModalProps) {
   const [routeName, setRouteName] = useState(LEAVENWORTH_ROUTES[0].name)
   const [customRoute, setCustomRoute] = useState('')
   const [useCustomRoute, setUseCustomRoute] = useState(false)
-  const [grade, setGrade] = useState('5.9')
   const [comment, setComment] = useState('')
   const [imageDataUrl, setImageDataUrl] = useState<string | undefined>()
   const [submitting, setSubmitting] = useState(false)
@@ -44,10 +36,12 @@ export function NewPostModal({ open, onClose }: NewPostModalProps) {
     if (!comment.trim()) return
     setSubmitting(true)
     await new Promise(r => setTimeout(r, 300))
+    const resolvedName = useCustomRoute ? customRoute || routeName : routeName
+    const resolvedGrade = LEAVENWORTH_ROUTES.find(r => r.name === resolvedName)?.grade ?? ''
     addPost({
       authorName,
-      routeName: useCustomRoute ? customRoute || routeName : routeName,
-      grade,
+      routeName: resolvedName,
+      grade: resolvedGrade,
       comment: comment.trim(),
       imageDataUrl,
     })
@@ -116,27 +110,6 @@ export function NewPostModal({ open, onClose }: NewPostModalProps) {
               ))}
             </select>
           )}
-        </div>
-
-        {/* Grade */}
-        <div>
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-tertiary block mb-2">Grade</label>
-          <div className="flex gap-1.5 flex-wrap">
-            {GRADES.map(g => (
-              <button
-                key={g}
-                onClick={() => setGrade(g)}
-                className={cn(
-                  'rounded-lg px-2.5 py-1 text-xs font-semibold transition-all border cursor-pointer',
-                  grade === g
-                    ? 'bg-brand-50 dark:bg-brand-subtle border-brand-border text-brand-700 dark:text-[#FF847C]'
-                    : 'bg-surface-secondary dark:bg-gray-800 border-card text-secondary hover:text-primary'
-                )}
-              >
-                {g}
-              </button>
-            ))}
-          </div>
         </div>
 
         {/* Comment */}

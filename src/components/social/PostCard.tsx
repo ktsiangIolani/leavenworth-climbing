@@ -39,7 +39,7 @@ export function PostCard({ post }: { post: FeedPost }) {
             <span className="text-xs font-semibold text-brand-700 dark:text-[#FF847C] bg-brand-50 dark:bg-brand-subtle rounded-full px-2.5 py-1 border border-brand-border">
               {post.routeName}
             </span>
-            <span className="text-xs text-tertiary font-medium">{post.grade}</span>
+            {post.grade && <span className="text-xs text-tertiary font-medium">{post.grade}</span>}
           </div>
         </div>
 
