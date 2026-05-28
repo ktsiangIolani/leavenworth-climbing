@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Design tokens ─────────────────────────────────────────────────────────── */
+@layer base {
+  :root {
+    /* Light mode — warm off-white base, rose brand */
+    --bg:           #FDF8F5;
+    --bg-alt:       #F6EDE4;
+    --card:         #FFFFFF;
+    --card-border:  #EDE0D6;
+
+    --text-1:       #2A363B;
+    --text-2:       #5E6E72;
+    --text-3:       #94A7AB;
+
+    --brand:        #E84A5F;
+    --brand-hover:  #D43A50;
+    --brand-subtle: #FEF0F2;
+    --brand-border: #F9B8C1;
+
+    --accent:       #FF847C;
+
+    --shadow-card:  0 1px 3px rgba(42,54,59,0.06), 0 4px 12px rgba(42,54,59,0.04);
+    --shadow-hover: 0 4px 16px rgba(42,54,59,0.12), 0 8px 32px rgba(42,54,59,0.06);
+    --shadow-nav:   0 -1px 0 rgba(42,54,59,0.08);
+
+    color-scheme: light dark;
+  }
+
+  /* Dark mode — dark slate base, coral brand */
+  .dark {
+    --bg:           #2A363B;
+    --bg-alt:       #2F3D42;
+    --card:         #354449;
+    --card-border:  rgba(254,206,171,0.10);
+
+    --text-1:       #FDF8F5;
+    --text-2:       #A4B8BC;
+    --text-3:       #5C7278;
+
+    --brand:        #FF847C;
+    --brand-hover:  #FECEAB;
+    --brand-subtle: rgba(255,132,124,0.12);
+    --brand-border: rgba(255,132,124,0.22);
+
+    --accent:       #FECEAB;
+
+    --shadow-card:  0 1px 0 rgba(254,206,171,0.06);
+    --shadow-hover: 0 4px 24px rgba(0,0,0,0.45);
+    --shadow-nav:   0 -1px 0 rgba(254,206,171,0.08);
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+    font-size: 16px;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text-1);
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overscroll-behavior: none;
+  }
+
+  /* Better text selection */
+  ::selection {
+    background-color: rgba(232,74,95,0.15);
+    color: var(--text-1);
+  }
+}
+
+/* ── Utility overrides ─────────────────────────────────────────────────────── */
+@layer utilities {
+  .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+  .safe-top    { padding-top: env(safe-area-inset-top); }
+
+  /* Hide scrollbar but preserve scroll */
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+  /* Token-based bg/text utilities */
+  .bg-surface        { background-color: var(--bg); }
+  .bg-surface-alt    { background-color: var(--bg-alt); }
+  .bg-card           { background-color: var(--card); }
+  .border-card       { border-color: var(--card-border); }
+  .text-primary      { color: var(--text-1); }
+  .text-secondary    { color: var(--text-2); }
+  .text-tertiary     { color: var(--text-3); }
+  .text-brand        { color: var(--brand); }
+  .bg-brand-subtle   { background-color: var(--brand-subtle); }
+  .border-brand      { border-color: var(--brand-border); }
+  .shadow-token-card { box-shadow: var(--shadow-card); }
+  .shadow-token-hover{ box-shadow: var(--shadow-hover); }
+
+  /* Interactive card pattern */
+  .card-interactive {
+    cursor: pointer;
+    transition: box-shadow 0.18s ease, transform 0.18s ease;
+  }
+  .card-interactive:hover  { box-shadow: var(--shadow-hover); transform: translateY(-1px); }
+  .card-interactive:active { box-shadow: var(--shadow-card); transform: translateY(0); }
+}
+
+/* ── Component layer ───────────────────────────────────────────────────────── */
+@layer components {
+  /* Skeleton shimmer */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--bg-alt, #F3F2EF) 0%,
+      var(--card-border, #EEECEA) 50%,
+      var(--bg-alt, #F3F2EF) 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.8s linear infinite;
+    border-radius: 8px;
+  }
+  .dark .skeleton {
+    background: linear-gradient(
+      90deg,
+      rgba(255,255,255,0.04) 0%,
+      rgba(255,255,255,0.08) 50%,
+      rgba(255,255,255,0.04) 100%
+    );
+    background-size: 200% 100%;
+  }
+
+  /* Leaflet dark theme */
+  .dark .leaflet-container {
+    filter: brightness(0.85) saturate(0.8);
+  }
+  .leaflet-popup-content-wrapper {
+    background: var(--card) !important;
+    color: var(--text-1) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 14px !important;
+    box-shadow: var(--shadow-hover) !important;
+  }
+  .leaflet-popup-tip {
+    background: var(--card) !important;
+  }
+  .leaflet-popup-close-button {
+    color: var(--text-2) !important;
+    font-size: 18px !important;
+  }
+  .leaflet-control-zoom a {
+    background: var(--card) !important;
+    color: var(--text-1) !important;
+    border-color: var(--card-border) !important;
+  }
+}
