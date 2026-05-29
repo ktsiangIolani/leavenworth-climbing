@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X } from 'lucide-react'
 
@@ -16,7 +17,7 @@ export function Modal({ open, onClose, title, children, fullscreen = false }: Mo
     return () => { document.body.style.overflow = '' }
   }, [open])
 
-  return (
+  return createPortal(
     <AnimatePresence>
       {open && (
         <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
@@ -79,7 +80,8 @@ export function Modal({ open, onClose, title, children, fullscreen = false }: Mo
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   )
 }
 

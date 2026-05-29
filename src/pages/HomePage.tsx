@@ -1,22 +1,28 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { RefreshCw, Sun, Moon, Users, Plus, Loader2 } from 'lucide-react'
+import { RefreshCw, Users, Plus, Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { useSchedule, getActiveDayGroup } from '../hooks/useSchedule'
 import { useAppStore } from '../store/appStore'
 import { useSocialFeed } from '../hooks/useSocialFeed'
+import { PARTICIPANTS } from '../data/participants'
 import { CountdownBanner } from '../components/home/CountdownBanner'
 import { TodayScheduleCard } from '../components/home/TodayScheduleCard'
 import { PostCard } from '../components/social/PostCard'
 import { NewPostModal } from '../components/social/NewPostModal'
+import { Modal } from '../components/ui/Modal'
+import { cn } from '../components/ui/cn'
 
 const PULL_THRESHOLD = 72
 
 export function HomePage() {
-  const { scheduleRefreshCount, triggerScheduleRefresh, darkMode, toggleDarkMode } = useAppStore()
+  const { scheduleRefreshCount, triggerScheduleRefresh, currentUser, setCurrentUser } = useAppStore()
   const { data, isLoading, isError, isFetching: schedFetching } = useSchedule(scheduleRefreshCount)
   const { posts, isFetching: feedFetching, isFetchingNextPage, fetchNextPage, hasNextPage, refetch } = useSocialFeed()
   const [newPostOpen, setNewPostOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
+
+  const currentParticipant = PARTICIPANTS.find(p => p.name === currentUser)
 
   // Pull-to-refresh state
   const touchStartY = useRef(0)
@@ -52,15 +58,18 @@ export function HomePage() {
     if (pullY >= PULL_THRESHOLD && !isRefreshing) {
       setIsRefreshing(true)
       setPullY(0)
-      await refetch()
-      setIsRefreshing(false)
+      try {
+        await refetch()
+      } finally {
+        setIsRefreshing(false)
+      }
     } else {
       setPullY(0)
     }
     touchStartY.current = 0
   }
 
-  const showIndicator = isRefreshing || feedFetching || pullY > 12
+  const showIndicator = isRefreshing || pullY > 12
 
   return (
     <div
@@ -93,13 +102,19 @@ export function HomePage() {
             >
               <RefreshCw size={14} className={schedFetching ? 'animate-spin' : ''} />
             </motion.button>
-            <motion.button
-              whileTap={{ scale: 0.88 }}
-              onClick={toggleDarkMode}
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-secondary dark:bg-gray-800 border border-card text-secondary hover:text-primary transition-colors cursor-pointer"
-            >
-              {darkMode ? <Sun size={14} /> : <Moon size={14} />}
-            </motion.button>
+            {currentParticipant && (
+              <motion.button
+                whileTap={{ scale: 0.88 }}
+                onClick={() => setProfileOpen(true)}
+                className={cn(
+                  'flex h-9 w-9 items-center justify-center rounded-full text-white text-xs font-bold shadow-sm cursor-pointer',
+                  currentParticipant.avatarColor
+                )}
+                title={currentParticipant.name}
+              >
+                {currentParticipant.initials}
+              </motion.button>
+            )}
           </div>
         </div>
 
@@ -127,19 +142,19 @@ export function HomePage() {
         />
 
         {/* Feed header */}
-        <div className="px-5 mb-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+        <div className="px-5 mb-4">
+          <div className="flex items-center gap-2 mb-3">
             <Users size={14} className="text-brand-700 dark:text-[#FF847C]" />
             <p className="text-xs font-semibold uppercase tracking-widest text-tertiary">Trip Feed</p>
             <span className="text-xs font-medium text-tertiary">{posts.length} sends</span>
           </div>
           <motion.button
-            whileTap={{ scale: 0.88 }}
+            whileTap={{ scale: 0.97 }}
             onClick={() => setNewPostOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold text-white bg-brand-700 hover:bg-brand-800 dark:bg-brand-600 dark:hover:bg-brand-700 shadow-sm transition-colors cursor-pointer"
+            className="flex items-center justify-center gap-2 w-full rounded-2xl py-4 text-base font-bold text-white bg-brand-700 hover:bg-brand-800 dark:bg-brand-600 dark:hover:bg-brand-700 shadow-md transition-colors cursor-pointer"
           >
-            <Plus size={12} />
-            Log Send
+            <Plus size={18} />
+            Log a Send
           </motion.button>
         </div>
 
@@ -208,6 +223,41 @@ export function HomePage() {
       </div>
 
       <NewPostModal open={newPostOpen} onClose={() => setNewPostOpen(false)} />
+
+      {/* Change profile sheet */}
+      <Modal open={profileOpen} onClose={() => setProfileOpen(false)} title="Switch Profile">
+        <div className="px-5 pb-6 pt-2 space-y-2.5">
+          {PARTICIPANTS.map(p => (
+            <motion.button
+              key={p.name}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => { setCurrentUser(p.name); setProfileOpen(false) }}
+              className={cn(
+                'flex items-center gap-4 w-full rounded-2xl px-4 py-3.5 border transition-all cursor-pointer',
+                currentUser === p.name
+                  ? 'bg-brand-50 dark:bg-brand-subtle border-brand-border'
+                  : 'bg-surface-secondary dark:bg-gray-800 border-card hover:border-brand-300 dark:hover:border-brand-800'
+              )}
+            >
+              <div className={cn(
+                'h-10 w-10 flex-shrink-0 rounded-full flex items-center justify-center text-white text-sm font-bold',
+                p.avatarColor
+              )}>
+                {p.initials}
+              </div>
+              <span className={cn(
+                'text-sm font-semibold flex-1 text-left',
+                currentUser === p.name ? 'text-brand-700 dark:text-[#FF847C]' : 'text-primary'
+              )}>
+                {p.name}
+              </span>
+              {currentUser === p.name && (
+                <span className="text-xs font-semibold text-brand-700 dark:text-[#FF847C]">You</span>
+              )}
+            </motion.button>
+          ))}
+        </div>
+      </Modal>
     </div>
   )
 }

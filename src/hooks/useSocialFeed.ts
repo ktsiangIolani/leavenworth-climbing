@@ -35,8 +35,8 @@ export function useSocialFeed() {
     getNextPageParam: (lastPage: PostsPage, allPages: PostsPage[]) =>
       lastPage.hasMore ? allPages.length * PAGE_SIZE : undefined,
     staleTime: 0,
-    retry: 3,
-    retryDelay: attempt => Math.min(1000 * 2 ** attempt, 8000),
+    retry: 1,
+    retryDelay: 1500,
   })
 
   const posts: FeedPost[] = data?.pages.flatMap(p => p.posts) ?? []
@@ -45,6 +45,7 @@ export function useSocialFeed() {
     authorName: string
     routeName: string
     grade: string
+    difficulty?: string
     comment: string
     imageDataUrl?: string
   }) => {
@@ -55,6 +56,7 @@ export function useSocialFeed() {
       avatarColor: getAvatarColor(postData.authorName),
       routeName: postData.routeName,
       grade: postData.grade,
+      difficulty: postData.difficulty ?? '',
       comment: postData.comment,
       timestamp: new Date().toISOString(),
       imageDataUrl: postData.imageDataUrl,

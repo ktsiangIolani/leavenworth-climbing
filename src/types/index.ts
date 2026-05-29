@@ -92,6 +92,7 @@ export interface FeedPost {
   avatarColor: string
   routeName: string
   grade: string
+  difficulty?: string
   comment: string
   timestamp: string // ISO
   imageDataUrl?: string

@@ -16,6 +16,7 @@ db.exec(`
     avatar_color TEXT NOT NULL,
     route_name   TEXT NOT NULL,
     grade        TEXT NOT NULL DEFAULT '',
+    difficulty   TEXT NOT NULL DEFAULT '',
     comment      TEXT NOT NULL,
     timestamp    TEXT NOT NULL,
     image_data_url TEXT,
@@ -32,6 +33,9 @@ db.exec(`
     timestamp       TEXT NOT NULL
   );
 `)
+
+// Add difficulty column to existing DBs that predate the field
+try { db.exec(`ALTER TABLE posts ADD COLUMN difficulty TEXT NOT NULL DEFAULT ''`) } catch {}
 
 const postCount = (db.prepare('SELECT COUNT(*) as n FROM posts').get() as { n: number }).n
 

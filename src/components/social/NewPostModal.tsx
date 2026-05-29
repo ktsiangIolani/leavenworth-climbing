@@ -3,7 +3,7 @@ import { Image, X, Loader2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Modal } from '../ui/Modal'
 import { useSocialFeed } from '../../hooks/useSocialFeed'
-import { PARTICIPANTS } from '../../data/participants'
+import { useAppStore } from '../../store/appStore'
 import { LEAVENWORTH_ROUTES } from '../../data/routes'
 import { cn } from '../ui/cn'
 
@@ -14,12 +14,20 @@ interface NewPostModalProps {
 
 export function NewPostModal({ open, onClose }: NewPostModalProps) {
   const { addPost } = useSocialFeed()
+  const currentUser = useAppStore(s => s.currentUser) ?? ''
   const fileRef = useRef<HTMLInputElement>(null)
 
-  const [authorName, setAuthorName] = useState(PARTICIPANTS[0].name)
+  const DIFFICULTY_GRADES = [
+    '5.6','5.7','5.8','5.9',
+    '5.10a','5.10b','5.10c','5.10d',
+    '5.11a','5.11b','5.11c','5.11d',
+    '5.12a','5.12b','5.12c','5.12d','5.12+',
+  ]
+
   const [routeName, setRouteName] = useState(LEAVENWORTH_ROUTES[0].name)
   const [customRoute, setCustomRoute] = useState('')
   const [useCustomRoute, setUseCustomRoute] = useState(false)
+  const [difficulty, setDifficulty] = useState('')
   const [comment, setComment] = useState('')
   const [imageDataUrl, setImageDataUrl] = useState<string | undefined>()
   const [submitting, setSubmitting] = useState(false)
@@ -38,9 +46,10 @@ export function NewPostModal({ open, onClose }: NewPostModalProps) {
     const resolvedName = useCustomRoute ? customRoute || routeName : routeName
     const resolvedGrade = LEAVENWORTH_ROUTES.find(r => r.name === resolvedName)?.grade ?? ''
     await addPost({
-      authorName,
+      authorName: currentUser,
       routeName: resolvedName,
       grade: resolvedGrade,
+      difficulty,
       comment: comment.trim(),
       imageDataUrl,
     })
@@ -48,6 +57,7 @@ export function NewPostModal({ open, onClose }: NewPostModalProps) {
     setImageDataUrl(undefined)
     setCustomRoute('')
     setUseCustomRoute(false)
+    setDifficulty('')
     setSubmitting(false)
     onClose()
   }
@@ -55,30 +65,6 @@ export function NewPostModal({ open, onClose }: NewPostModalProps) {
   return (
     <Modal open={open} onClose={onClose} title="Log a Send">
       <div className="px-5 pb-6 pt-3 space-y-5">
-
-        {/* Climber */}
-        <div>
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-tertiary block mb-2">Climber</label>
-          <div className="flex gap-2 flex-wrap">
-            {PARTICIPANTS.map(p => (
-              <button
-                key={p.name}
-                onClick={() => setAuthorName(p.name)}
-                className={cn(
-                  'flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all border cursor-pointer',
-                  authorName === p.name
-                    ? 'bg-brand-50 dark:bg-brand-subtle border-brand-border text-brand-700 dark:text-[#FF847C]'
-                    : 'bg-surface-secondary dark:bg-gray-800 border-card text-secondary hover:text-primary'
-                )}
-              >
-                <div className={cn('h-5 w-5 rounded-full flex items-center justify-center text-white text-[9px] font-bold', p.avatarColor)}>
-                  {p.initials}
-                </div>
-                {p.name}
-              </button>
-            ))}
-          </div>
-        </div>
 
         {/* Route */}
         <div>
@@ -109,6 +95,32 @@ export function NewPostModal({ open, onClose }: NewPostModalProps) {
               ))}
             </select>
           )}
+        </div>
+
+        {/* Difficulty */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-[11px] font-semibold uppercase tracking-wider text-tertiary">Felt Difficulty</label>
+            {difficulty && (
+              <button onClick={() => setDifficulty('')} className="text-[11px] font-semibold text-tertiary hover:text-primary cursor-pointer">Clear</button>
+            )}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {DIFFICULTY_GRADES.map(g => (
+              <button
+                key={g}
+                onClick={() => setDifficulty(d => d === g ? '' : g)}
+                className={cn(
+                  'rounded-lg px-2.5 py-1.5 text-xs font-semibold transition-all border cursor-pointer',
+                  difficulty === g
+                    ? 'bg-brand-700 dark:bg-brand-600 border-brand-700 dark:border-brand-600 text-white'
+                    : 'bg-surface-secondary dark:bg-gray-800 border-card text-secondary hover:text-primary hover:border-brand-300 dark:hover:border-brand-800'
+                )}
+              >
+                {g}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Comment */}
@@ -154,15 +166,15 @@ export function NewPostModal({ open, onClose }: NewPostModalProps) {
           onClick={handleSubmit}
           disabled={!comment.trim() || submitting}
           className={cn(
-            'w-full rounded-xl py-3.5 text-sm font-bold transition-all cursor-pointer',
+            'w-full rounded-2xl py-4 text-base font-bold transition-all cursor-pointer',
             comment.trim() && !submitting
-              ? 'bg-brand-700 hover:bg-brand-800 dark:bg-brand-600 dark:hover:bg-brand-700 text-white shadow-sm'
+              ? 'bg-brand-700 hover:bg-brand-800 dark:bg-brand-600 dark:hover:bg-brand-700 text-white shadow-md'
               : 'bg-surface-secondary dark:bg-gray-800 text-tertiary cursor-not-allowed'
           )}
         >
           {submitting ? (
             <span className="flex items-center justify-center gap-2">
-              <Loader2 size={15} className="animate-spin" />
+              <Loader2 size={16} className="animate-spin" />
               Posting…
             </span>
           ) : 'Post Send'}

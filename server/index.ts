@@ -14,6 +14,7 @@ function mapPost(p: Record<string, unknown>, comments: Record<string, unknown>[]
     avatarColor: p.avatar_color,
     routeName: p.route_name,
     grade: p.grade,
+    difficulty: p.difficulty ?? '',
     comment: p.comment,
     timestamp: p.timestamp,
     imageDataUrl: p.image_data_url ?? undefined,
@@ -55,11 +56,11 @@ app.get('/api/posts', (req, res) => {
 })
 
 app.post('/api/posts', (req, res) => {
-  const { id, authorName, authorInitials, avatarColor, routeName, grade, comment, timestamp, imageDataUrl } = req.body
+  const { id, authorName, authorInitials, avatarColor, routeName, grade, difficulty, comment, timestamp, imageDataUrl } = req.body
   db.prepare(`
-    INSERT INTO posts (id, author_name, author_initials, avatar_color, route_name, grade, comment, timestamp, image_data_url)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `).run(id, authorName, authorInitials, avatarColor, routeName, grade ?? '', comment, timestamp, imageDataUrl ?? null)
+    INSERT INTO posts (id, author_name, author_initials, avatar_color, route_name, grade, difficulty, comment, timestamp, image_data_url)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `).run(id, authorName, authorInitials, avatarColor, routeName, grade ?? '', difficulty ?? '', comment, timestamp, imageDataUrl ?? null)
   res.json({ ok: true })
 })
 

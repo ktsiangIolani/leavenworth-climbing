@@ -4,6 +4,10 @@ import { persist } from 'zustand/middleware'
 import { NavTab } from '../types'
 
 interface AppStore {
+  // Current user (persisted)
+  currentUser: string | null
+  setCurrentUser: (name: string | null) => void
+
   // Navigation
   activeTab: NavTab
   setActiveTab: (tab: NavTab) => void
@@ -34,6 +38,9 @@ interface AppStore {
 export const useAppStore = create<AppStore>()(
   persist(
     (set) => ({
+      currentUser: null,
+      setCurrentUser: (name) => set({ currentUser: name }),
+
       activeTab: 'home',
       setActiveTab: (tab) => set({ activeTab: tab }),
 
@@ -82,6 +89,7 @@ export const useAppStore = create<AppStore>()(
     {
       name: 'leavenworth-app-state',
       partialize: (s) => ({
+        currentUser: s.currentUser,
         darkMode: s.darkMode,
         completedEvents: s.completedEvents,
         interestedRoutes: s.interestedRoutes,

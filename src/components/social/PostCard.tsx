@@ -3,19 +3,23 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, Send } from 'lucide-react'
 import type { FeedPost } from '../../types'
 import { useSocialFeed } from '../../hooks/useSocialFeed'
+import { useAppStore } from '../../store/appStore'
+import { PARTICIPANTS } from '../../data/participants'
 import { relativeTime } from '../../utils/helpers'
 import { Modal } from '../ui/Modal'
 import { cn } from '../ui/cn'
 
 export function PostCard({ post }: { post: FeedPost }) {
   const { addComment } = useSocialFeed()
+  const currentUser = useAppStore(s => s.currentUser) ?? ''
+  const me = PARTICIPANTS.find(p => p.name === currentUser)
   const [showComments, setShowComments] = useState(false)
   const [commentText, setCommentText] = useState('')
   const [imageModal, setImageModal] = useState(false)
 
   const handleComment = () => {
     if (!commentText.trim()) return
-    addComment(post.id, 'You', commentText.trim())
+    addComment(post.id, currentUser, commentText.trim())
     setCommentText('')
   }
 
@@ -39,7 +43,14 @@ export function PostCard({ post }: { post: FeedPost }) {
             <span className="text-xs font-semibold text-brand-700 dark:text-[#FF847C] bg-brand-50 dark:bg-brand-subtle rounded-full px-2.5 py-1 border border-brand-border">
               {post.routeName}
             </span>
-            {post.grade && <span className="text-xs text-tertiary font-medium">{post.grade}</span>}
+            <div className="flex items-center gap-1">
+              {post.grade && <span className="text-xs text-tertiary font-medium">{post.grade}</span>}
+              {post.difficulty && (
+                <span className="text-xs font-bold text-white bg-brand-700 dark:bg-brand-600 rounded-full px-2 py-0.5">
+                  {post.difficulty}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -106,8 +117,8 @@ export function PostCard({ post }: { post: FeedPost }) {
 
                 {/* Add comment */}
                 <div className="flex gap-2.5">
-                  <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-brand-700 text-white text-[10px] font-bold">
-                    YO
+                  <div className={cn('flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full text-white text-[10px] font-bold', me?.avatarColor ?? 'bg-brand-700')}>
+                    {me?.initials ?? '?'}
                   </div>
                   <div className="flex flex-1 gap-2">
                     <input

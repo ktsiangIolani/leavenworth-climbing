@@ -6,6 +6,7 @@ import { AppLayout } from './components/layout/AppLayout'
 import { HomePage } from './pages/HomePage'
 import { SchedulePage } from './pages/SchedulePage'
 import { RoutesPage } from './pages/RoutesPage'
+import { LoginPage } from './pages/LoginPage'
 import { NavTab } from './types'
 
 const queryClient = new QueryClient({
@@ -24,9 +25,8 @@ const PAGE_MAP: Record<NavTab, JSX.Element> = {
 }
 
 function AppContent() {
-  const { activeTab, darkMode } = useAppStore()
+  const { activeTab, darkMode, currentUser } = useAppStore()
 
-  // Apply dark mode class on mount and whenever it changes
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark')
@@ -34,6 +34,10 @@ function AppContent() {
       document.documentElement.classList.remove('dark')
     }
   }, [darkMode])
+
+  if (!currentUser) {
+    return <LoginPage />
+  }
 
   return (
     <AppLayout>
