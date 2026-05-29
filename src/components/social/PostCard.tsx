@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Heart, MessageCircle, Send } from 'lucide-react'
+import { MessageCircle, Send } from 'lucide-react'
 import type { FeedPost } from '../../types'
 import { useSocialFeed } from '../../hooks/useSocialFeed'
 import { relativeTime } from '../../utils/helpers'
@@ -8,7 +8,7 @@ import { Modal } from '../ui/Modal'
 import { cn } from '../ui/cn'
 
 export function PostCard({ post }: { post: FeedPost }) {
-  const { toggleLike, addComment } = useSocialFeed()
+  const { addComment } = useSocialFeed()
   const [showComments, setShowComments] = useState(false)
   const [commentText, setCommentText] = useState('')
   const [imageModal, setImageModal] = useState(false)
@@ -65,20 +65,6 @@ export function PostCard({ post }: { post: FeedPost }) {
 
         {/* Actions */}
         <div className="flex items-center gap-1 px-3 pb-3 pt-1">
-          <motion.button
-            whileTap={{ scale: 0.82 }}
-            onClick={() => toggleLike(post.id)}
-            className={cn(
-              'flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold transition-all cursor-pointer',
-              post.likedByMe
-                ? 'bg-red-50 dark:bg-red-900/20 text-red-500 border border-red-200 dark:border-red-800/40'
-                : 'bg-surface-secondary dark:bg-gray-800 text-secondary border border-card hover:text-red-500'
-            )}
-          >
-            <Heart size={15} fill={post.likedByMe ? 'currentColor' : 'none'} />
-            {post.likes}
-          </motion.button>
-
           <button
             onClick={() => setShowComments(s => !s)}
             className={cn(

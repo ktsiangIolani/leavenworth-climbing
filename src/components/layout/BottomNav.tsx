@@ -1,11 +1,10 @@
 import { motion } from 'framer-motion'
-import { Home, Calendar, Mountain, Users } from 'lucide-react'
+import { Home, Calendar, Mountain } from 'lucide-react'
 import { useAppStore } from '../../store/appStore'
 import type { NavTab } from '../../types'
 
 const TABS: Array<{ tab: NavTab; label: string; Icon: typeof Home }> = [
   { tab: 'home',     label: 'Home',     Icon: Home },
-  { tab: 'feed',     label: 'Feed',     Icon: Users },
   { tab: 'schedule', label: 'Schedule', Icon: Calendar },
   { tab: 'routes',   label: 'Routes',   Icon: Mountain },
 ]

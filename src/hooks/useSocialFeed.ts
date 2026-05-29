@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { FeedPost } from '../types'
-import { useLocalStorage } from './useLocalStorage'
 import { getAvatarColor, getInitials } from '../utils/helpers'
 
 const API = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '')
@@ -14,15 +13,12 @@ async function fetchPosts(): Promise<FeedPost[]> {
 
 export function useSocialFeed() {
   const queryClient = useQueryClient()
-  const [likedIds, setLikedIds] = useLocalStorage<string[]>('leavenworth-liked', [])
 
-  const { data: rawPosts = [] } = useQuery<FeedPost[]>({
+  const { data: posts = [] } = useQuery<FeedPost[]>({
     queryKey: ['posts'],
     queryFn: fetchPosts,
     staleTime: 30_000,
   })
-
-  const posts: FeedPost[] = rawPosts.map(p => ({ ...p, likedByMe: likedIds.includes(p.id) }))
 
   const addPost = useCallback(async (data: {
     authorName: string
@@ -50,17 +46,6 @@ export function useSocialFeed() {
     queryClient.invalidateQueries({ queryKey: ['posts'] })
   }, [queryClient])
 
-  const toggleLike = useCallback(async (postId: string) => {
-    const isLiked = likedIds.includes(postId)
-    setLikedIds(prev => isLiked ? prev.filter(id => id !== postId) : [...prev, postId])
-    await fetch(`${API}/api/posts/${postId}/like`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ increment: !isLiked }),
-    })
-    queryClient.invalidateQueries({ queryKey: ['posts'] })
-  }, [likedIds, setLikedIds, queryClient])
-
   const addComment = useCallback(async (postId: string, authorName: string, text: string) => {
     const body = {
       id: `comment-${Date.now()}`,
@@ -78,5 +63,5 @@ export function useSocialFeed() {
     queryClient.invalidateQueries({ queryKey: ['posts'] })
   }, [queryClient])
 
-  return { posts, addPost, toggleLike, addComment }
+  return { posts, addPost, addComment }
 }

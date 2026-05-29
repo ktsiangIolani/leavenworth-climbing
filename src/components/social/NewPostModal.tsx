@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Image, X } from 'lucide-react'
+import { Image, X, Loader2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { Modal } from '../ui/Modal'
 import { useSocialFeed } from '../../hooks/useSocialFeed'
@@ -160,7 +160,12 @@ export function NewPostModal({ open, onClose }: NewPostModalProps) {
               : 'bg-surface-secondary dark:bg-gray-800 text-tertiary cursor-not-allowed'
           )}
         >
-          {submitting ? 'Posting…' : 'Post Send'}
+          {submitting ? (
+            <span className="flex items-center justify-center gap-2">
+              <Loader2 size={15} className="animate-spin" />
+              Posting…
+            </span>
+          ) : 'Post Send'}
         </motion.button>
       </div>
     </Modal>

@@ -25,6 +25,10 @@ interface AppStore {
   // Refresh trigger
   scheduleRefreshCount: number
   triggerScheduleRefresh: () => void
+
+  // Pending map focus (set when navigating to routes map from another screen)
+  pendingMapRouteId: string | null
+  setPendingMapRoute: (routeId: string | null) => void
 }
 
 export const useAppStore = create<AppStore>()(
@@ -71,6 +75,9 @@ export const useAppStore = create<AppStore>()(
       scheduleRefreshCount: 0,
       triggerScheduleRefresh: () =>
         set(s => ({ scheduleRefreshCount: s.scheduleRefreshCount + 1 })),
+
+      pendingMapRouteId: null,
+      setPendingMapRoute: (routeId) => set({ pendingMapRouteId: routeId }),
     }),
     {
       name: 'leavenworth-app-state',

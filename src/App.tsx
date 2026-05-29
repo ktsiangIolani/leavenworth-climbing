@@ -6,7 +6,6 @@ import { AppLayout } from './components/layout/AppLayout'
 import { HomePage } from './pages/HomePage'
 import { SchedulePage } from './pages/SchedulePage'
 import { RoutesPage } from './pages/RoutesPage'
-import { SocialPage } from './pages/SocialPage'
 import { NavTab } from './types'
 
 const queryClient = new QueryClient({
@@ -22,7 +21,6 @@ const PAGE_MAP: Record<NavTab, JSX.Element> = {
   home:     <HomePage />,
   schedule: <SchedulePage />,
   routes:   <RoutesPage />,
-  feed:     <SocialPage />,
 }
 
 function AppContent() {
@@ -42,9 +40,9 @@ function AppContent() {
       <AnimatePresence mode="wait">
         <motion.div
           key={activeTab}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           transition={{ duration: 0.2, ease: 'easeOut' }}
         >
           {PAGE_MAP[activeTab]}

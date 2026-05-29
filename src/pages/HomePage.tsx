@@ -22,8 +22,8 @@ export function HomePage() {
     <div className="min-h-screen bg-surface">
       {/* Header */}
       <motion.header
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         className="sticky top-0 z-30 bg-surface/90 backdrop-blur-xl border-b border-card px-4 pt-[max(env(safe-area-inset-top),12px)] pb-3"
       >
         <div className="flex items-center justify-between">

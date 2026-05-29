@@ -1,7 +1,7 @@
 import { parseCsv, groupByDay, FALLBACK_CSV } from '../utils/scheduleParser'
 import { ScheduleEvent, DayGroup } from '../types'
 
-const SHEET_ID = '1PGJrobk9nE9Uu1cqFCsBvpaNDXXdEhrk_X_n-JIRuBg'
+const SHEET_ID = '1QExIlM78dj-_8PrCTQpsjIKK8Ojp97QKQH0nsnigCsk'
 
 // gviz/tq endpoint works for sheets shared as "Anyone with the link can view"
 // without requiring an API key. It handles CORS in the browser.

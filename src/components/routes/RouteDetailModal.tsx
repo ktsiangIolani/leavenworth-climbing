@@ -16,8 +16,14 @@ const STYLE_BADGE: Record<string, 'green' | 'blue' | 'amber'> = {
 }
 
 export function RouteDetailModal({ route, onClose }: Props) {
-  const { interestedRoutes, completedRoutes, toggleInterestedRoute, toggleCompletedRoute } = useAppStore()
+  const { interestedRoutes, completedRoutes, toggleInterestedRoute, toggleCompletedRoute, setActiveTab, setPendingMapRoute } = useAppStore()
   if (!route) return null
+
+  function handleViewOnMap() {
+    setPendingMapRoute(route!.id)
+    setActiveTab('routes')
+    onClose()
+  }
 
   const interested = interestedRoutes.includes(route.id)
   const completed  = completedRoutes.includes(route.id)
@@ -96,6 +102,24 @@ export function RouteDetailModal({ route, onClose }: Props) {
             <p className="text-sm text-secondary leading-relaxed">{route.notes}</p>
           </div>
         )}
+
+        {/* View on map */}
+        <motion.button
+          whileTap={{ scale: 0.97 }}
+          onClick={handleViewOnMap}
+          className="flex items-center justify-between gap-3 w-full bg-surface-secondary dark:bg-gray-800 rounded-2xl p-4 border border-card hover:border-brand-200 dark:hover:border-brand-800 transition-colors group cursor-pointer"
+        >
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 dark:bg-brand-subtle flex-shrink-0">
+              <MapPin size={16} className="text-brand-700 dark:text-[#FF847C]" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-primary">View on map</p>
+              <p className="text-xs text-tertiary">See location &amp; nearby routes</p>
+            </div>
+          </div>
+          <MapPin size={14} className="text-tertiary group-hover:text-primary transition-colors flex-shrink-0" />
+        </motion.button>
 
         {/* Mountain Project link */}
         {route.mpUrl && (

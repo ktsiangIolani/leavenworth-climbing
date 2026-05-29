@@ -111,7 +111,7 @@ export interface Participant {
 
 // ── App State ─────────────────────────────────────────────────────────────────
 
-export type NavTab = 'home' | 'schedule' | 'routes' | 'feed'
+export type NavTab = 'home' | 'schedule' | 'routes'
 
 export interface AppState {
   activeTab: NavTab

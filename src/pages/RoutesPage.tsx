@@ -1,8 +1,9 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mountain, Search, Map, List, SlidersHorizontal } from 'lucide-react'
 import { LEAVENWORTH_ROUTES, ROUTE_AREAS } from '../data/routes'
 import { ClimbingRoute, ClimbingStyle } from '../types'
+import { useAppStore } from '../store/appStore'
 import { RouteCard } from '../components/routes/RouteCard'
 import { RouteMap } from '../components/routes/RouteMap'
 import { RouteDetailModal } from '../components/routes/RouteDetailModal'
@@ -23,6 +24,14 @@ export function RoutesPage() {
   const [selectedRoute, setSelectedRoute] = useState<ClimbingRoute | null>(null)
   const [focusedRoute, setFocusedRoute] = useState<ClimbingRoute | null>(null)
   const [showFilters, setShowFilters] = useState(false)
+
+  const { pendingMapRouteId, setPendingMapRoute } = useAppStore()
+  useEffect(() => {
+    if (!pendingMapRouteId) return
+    const route = LEAVENWORTH_ROUTES.find(r => r.id === pendingMapRouteId)
+    if (route) { setView('map'); setFocusedRoute(route) }
+    setPendingMapRoute(null)
+  }, [pendingMapRouteId, setPendingMapRoute])
 
   const filtered = useMemo(() => {
     return LEAVENWORTH_ROUTES
@@ -46,8 +55,8 @@ export function RoutesPage() {
     <div className="min-h-screen flex flex-col bg-surface">
       {/* Header */}
       <motion.header
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         className="flex-shrink-0 sticky top-0 z-30 bg-surface/90 backdrop-blur-xl border-b border-card px-4 pt-[max(env(safe-area-inset-top),12px)] pb-0"
       >
         <div className="flex items-center justify-between pb-3">

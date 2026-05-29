@@ -21,12 +21,12 @@ export function DaySection({ group, filter = 'all' }: Props) {
 
   return (
     <motion.section
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
       transition={{ duration: 0.25 }}
     >
       {/* Sticky day header */}
-      <div className="sticky top-[8.5rem] z-10 bg-surface/90 dark:bg-gray-900/90 backdrop-blur-lg px-5 py-3">
+      <div className="sticky top-[6.2rem] z-10 bg-surface/90 dark:bg-gray-900/90 backdrop-blur-lg px-5 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
             {/* Day dot */}
