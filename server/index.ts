@@ -32,10 +32,26 @@ function mapPost(p: Record<string, unknown>, comments: Record<string, unknown>[]
   }
 }
 
-app.get('/api/posts', (_req, res) => {
-  const posts = db.prepare('SELECT * FROM posts ORDER BY timestamp DESC').all() as Record<string, unknown>[]
-  const comments = db.prepare('SELECT * FROM comments ORDER BY timestamp ASC').all() as Record<string, unknown>[]
-  res.json(posts.map(p => mapPost(p, comments)))
+app.get('/api/posts', (req, res) => {
+  const limit  = Math.min(parseInt((req.query.limit  as string) || '8', 10), 50)
+  const offset = Math.max(parseInt((req.query.offset as string) || '0', 10), 0)
+
+  const { total } = db.prepare('SELECT COUNT(*) as total FROM posts').get() as { total: number }
+  const posts = db.prepare(
+    'SELECT * FROM posts ORDER BY timestamp DESC LIMIT ? OFFSET ?'
+  ).all(limit, offset) as Record<string, unknown>[]
+
+  const comments = posts.length > 0
+    ? db.prepare(
+        `SELECT * FROM comments WHERE post_id IN (${posts.map(() => '?').join(',')}) ORDER BY timestamp ASC`
+      ).all(...posts.map(p => p.id)) as Record<string, unknown>[]
+    : []
+
+  res.json({
+    posts: posts.map(p => mapPost(p, comments)),
+    total,
+    hasMore: offset + posts.length < total,
+  })
 })
 
 app.post('/api/posts', (req, res) => {

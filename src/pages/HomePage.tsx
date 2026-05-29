@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { RefreshCw, Sun, Moon, Users, Plus } from 'lucide-react'
+import { RefreshCw, Sun, Moon, Users, Plus, Loader2 } from 'lucide-react'
 import { format } from 'date-fns'
 import { useSchedule, getActiveDayGroup } from '../hooks/useSchedule'
 import { useAppStore } from '../store/appStore'
@@ -10,16 +10,65 @@ import { TodayScheduleCard } from '../components/home/TodayScheduleCard'
 import { PostCard } from '../components/social/PostCard'
 import { NewPostModal } from '../components/social/NewPostModal'
 
+const PULL_THRESHOLD = 72
+
 export function HomePage() {
   const { scheduleRefreshCount, triggerScheduleRefresh, darkMode, toggleDarkMode } = useAppStore()
-  const { data, isLoading, isError, isFetching } = useSchedule(scheduleRefreshCount)
-  const { posts } = useSocialFeed()
+  const { data, isLoading, isError, isFetching: schedFetching } = useSchedule(scheduleRefreshCount)
+  const { posts, isFetching: feedFetching, isFetchingNextPage, fetchNextPage, hasNextPage, refetch } = useSocialFeed()
   const [newPostOpen, setNewPostOpen] = useState(false)
+
+  // Pull-to-refresh state
+  const touchStartY = useRef(0)
+  const [pullY, setPullY] = useState(0)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+
+  // Infinite scroll sentinel
+  const sentinelRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => { if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) fetchNextPage() },
+      { threshold: 0.1 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage])
 
   const activeGroup = data ? getActiveDayGroup(data.groups) : null
 
+  function onTouchStart(e: React.TouchEvent) {
+    if (window.scrollY === 0) touchStartY.current = e.touches[0].clientY
+  }
+
+  function onTouchMove(e: React.TouchEvent) {
+    if (!touchStartY.current) return
+    const dy = e.touches[0].clientY - touchStartY.current
+    if (dy > 0) setPullY(Math.min(dy, PULL_THRESHOLD + 24))
+  }
+
+  async function onTouchEnd() {
+    if (pullY >= PULL_THRESHOLD && !isRefreshing) {
+      setIsRefreshing(true)
+      setPullY(0)
+      await refetch()
+      setIsRefreshing(false)
+    } else {
+      setPullY(0)
+    }
+    touchStartY.current = 0
+  }
+
+  const showIndicator = isRefreshing || feedFetching || pullY > 12
+
   return (
-    <div className="min-h-screen bg-surface">
+    <div
+      className="min-h-screen bg-surface"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
       {/* Header */}
       <motion.header
         initial={{ opacity: 0 }}
@@ -39,10 +88,10 @@ export function HomePage() {
             <motion.button
               whileTap={{ scale: 0.88 }}
               onClick={triggerScheduleRefresh}
-              disabled={isFetching}
+              disabled={schedFetching}
               className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface-secondary dark:bg-gray-800 border border-card text-secondary hover:text-primary transition-colors disabled:opacity-40 cursor-pointer"
             >
-              <RefreshCw size={14} className={isFetching ? 'animate-spin' : ''} />
+              <RefreshCw size={14} className={schedFetching ? 'animate-spin' : ''} />
             </motion.button>
             <motion.button
               whileTap={{ scale: 0.88 }}
@@ -76,7 +125,8 @@ export function HomePage() {
           isLoading={isLoading}
           isError={isError}
         />
-        {/* Feed */}
+
+        {/* Feed header */}
         <div className="px-5 mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Users size={14} className="text-brand-700 dark:text-[#FF847C]" />
@@ -93,8 +143,27 @@ export function HomePage() {
           </motion.button>
         </div>
 
+        {/* Pull-to-refresh indicator */}
+        <div
+          className="flex items-center justify-center overflow-hidden transition-all duration-200"
+          style={{ height: showIndicator ? 36 : 0, opacity: showIndicator ? 1 : 0 }}
+        >
+          <Loader2
+            size={18}
+            className="text-brand-600 dark:text-[#FF847C]"
+            style={{
+              animation: isRefreshing || feedFetching ? 'spin 0.8s linear infinite' : 'none',
+              transform: isRefreshing || feedFetching ? undefined : `rotate(${Math.min(pullY / PULL_THRESHOLD, 1) * 360}deg)`,
+            }}
+          />
+          <span className="ml-2 text-xs text-tertiary">
+            {isRefreshing || feedFetching ? 'Refreshing…' : pullY >= PULL_THRESHOLD ? 'Release to refresh' : 'Pull to refresh'}
+          </span>
+        </div>
+
+        {/* Posts */}
         <div className="px-5 pb-4">
-          {posts.length === 0 ? (
+          {posts.length === 0 && !feedFetching ? (
             <div className="py-12 text-center">
               <div className="mx-auto mb-4 h-14 w-14 rounded-2xl bg-surface-secondary dark:bg-gray-800 border border-card flex items-center justify-center">
                 <Users size={24} className="text-tertiary" />
@@ -113,9 +182,9 @@ export function HomePage() {
               {posts.map((post, i) => (
                 <motion.div
                   key={post.id}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.06 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: i * 0.04 }}
                 >
                   <PostCard post={post} />
                 </motion.div>
@@ -124,7 +193,18 @@ export function HomePage() {
           )}
         </div>
 
-        <div className="h-4" />
+        {/* Infinite scroll sentinel + footer */}
+        <div ref={sentinelRef} className="flex items-center justify-center py-4 px-5">
+          {isFetchingNextPage && (
+            <span className="flex items-center gap-2 text-xs text-tertiary">
+              <Loader2 size={14} className="animate-spin text-brand-600 dark:text-[#FF847C]" />
+              Loading more…
+            </span>
+          )}
+          {!hasNextPage && posts.length > 0 && !feedFetching && (
+            <p className="text-xs text-tertiary">All {posts.length} sends loaded</p>
+          )}
+        </div>
       </div>
 
       <NewPostModal open={newPostOpen} onClose={() => setNewPostOpen(false)} />

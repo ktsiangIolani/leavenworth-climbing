@@ -52,6 +52,8 @@ export function PostCard({ post }: { post: FeedPost }) {
             <img
               src={post.imageDataUrl}
               alt={post.routeName}
+              loading="lazy"
+              decoding="async"
               className="w-full object-cover hover:opacity-95 transition-opacity"
               style={{ maxHeight: '280px' }}
             />
