@@ -9,7 +9,7 @@ RUN npm ci
 COPY . .
 
 # Baked in at build time — pass your backend Cloud Run URL here
-ARG VITE_API_URL=""
+ARG VITE_API_URL="https://leavenworth-climbing-be-669394454391.europe-west1.run.app"
 ENV VITE_API_URL=$VITE_API_URL
 
 RUN npm run build
