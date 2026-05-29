@@ -20,7 +20,7 @@ export function Modal({ open, onClose, title, children, fullscreen = false }: Mo
   return createPortal(
     <AnimatePresence>
       {open && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center">
+        <div className="fixed inset-0 z-[2000] flex items-end justify-center sm:items-center">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
