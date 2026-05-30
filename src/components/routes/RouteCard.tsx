@@ -2,7 +2,6 @@ import { motion } from 'framer-motion'
 import { Star, Clock, Layers, MapPin } from 'lucide-react'
 import type { ClimbingRoute } from '../../types'
 import { Badge } from '../ui/Badge'
-import { cn } from '../ui/cn'
 
 const STYLE_BADGE: Record<string, 'green' | 'blue' | 'amber'> = {
   Sport: 'green', Trad: 'blue', Boulder: 'amber',
