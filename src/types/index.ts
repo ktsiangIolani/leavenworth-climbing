@@ -47,7 +47,6 @@ export interface ClimbingRoute {
   height: string
   stars: number       // 1-5
   area: string
-  approach: string    // "10 min", "2 hr", etc.
   lat: number
   lng: number
   notes: string

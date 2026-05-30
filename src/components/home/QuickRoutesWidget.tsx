@@ -4,7 +4,7 @@ import { LEAVENWORTH_ROUTES } from '../../data/routes'
 import { useAppStore } from '../../store/appStore'
 import { Badge } from '../ui/Badge'
 
-const FEATURED = LEAVENWORTH_ROUTES.filter(r => r.stars >= 5).slice(0, 5)
+const FEATURED = LEAVENWORTH_ROUTES.filter(r => r.stars >= 4).slice(0, 5)
 
 const STYLE_VARIANT: Record<string, 'green' | 'blue' | 'amber'> = {
   Sport: 'green', Trad: 'blue', Boulder: 'amber',
@@ -53,9 +53,6 @@ export function QuickRoutesWidget() {
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-medium text-secondary bg-surface-secondary dark:bg-gray-800 rounded-lg px-2 py-1">
                 {route.style}
-              </span>
-              <span className="text-xs font-medium text-secondary bg-surface-secondary dark:bg-gray-800 rounded-lg px-2 py-1">
-                {route.approach}
               </span>
             </div>
           </motion.button>

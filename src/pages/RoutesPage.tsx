@@ -87,7 +87,7 @@ export function RoutesPage() {
       {/* Content */}
       <div className="flex-1">
         {view === 'map' ? (
-          <div style={{ height: 'calc(100vh - 16rem)' }}>
+          <div style={{ height: 'calc(100dvh - 16rem - env(safe-area-inset-bottom))' }}>
             <RouteMap routes={filtered} onRouteClick={setSelectedRoute} focusRoute={focusedRoute} />
           </div>
         ) : (

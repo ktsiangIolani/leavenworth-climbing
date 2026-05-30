@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { Star, Clock, Layers, MapPin } from 'lucide-react'
+import { Star, Layers, MapPin } from 'lucide-react'
 import type { ClimbingRoute } from '../../types'
 import { Badge } from '../ui/Badge'
 
@@ -47,18 +47,12 @@ export function RouteCard({ route, onClick, onMapOpen }: RouteCardProps) {
         )}
       </div>
 
-      {/* Stars + approach */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-0.5">
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} size={13} className={i < route.stars ? 'fill-amber-400 text-amber-400' : 'text-gray-200 dark:text-gray-700'} />
-          ))}
-          <span className="ml-1.5 text-xs font-medium text-secondary">{route.stars}.0</span>
-        </div>
-        <div className="flex items-center gap-1 text-xs font-medium text-secondary">
-          <Clock size={11} className="text-tertiary" />
-          {route.approach} approach
-        </div>
+      {/* Stars */}
+      <div className="flex items-center gap-0.5">
+        {[...Array(4)].map((_, i) => (
+          <Star key={i} size={13} className={i < route.stars ? 'fill-amber-400 text-amber-400' : 'text-gray-200 dark:text-gray-700'} />
+        ))}
+        <span className="ml-1.5 text-xs font-medium text-secondary">{route.stars}/4</span>
       </div>
 
       {/* Notes excerpt */}

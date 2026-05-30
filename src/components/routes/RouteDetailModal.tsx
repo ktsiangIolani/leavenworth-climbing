@@ -1,4 +1,4 @@
-import { Heart, CheckCircle2, Clock, Layers, Star, MapPin, ExternalLink } from 'lucide-react'
+import { Heart, CheckCircle2, Layers, Star, MapPin, ExternalLink } from 'lucide-react'
 import { motion } from 'framer-motion'
 import type { ClimbingRoute } from '../../types'
 import { Modal } from '../ui/Modal'
@@ -71,10 +71,10 @@ export function RouteDetailModal({ route, onClose }: Props) {
 
         {/* Stars */}
         <div className="flex items-center gap-1.5">
-          {[...Array(5)].map((_, i) => (
+          {[...Array(4)].map((_, i) => (
             <Star key={i} size={20} className={i < route.stars ? 'fill-amber-400 text-amber-400' : 'text-gray-200 dark:text-gray-700'} />
           ))}
-          <span className="ml-1 text-sm font-semibold text-secondary">{route.stars}/5 stars</span>
+          <span className="ml-1 text-sm font-semibold text-secondary">{route.stars}/4 stars</span>
         </div>
 
         {/* Specs */}
@@ -82,7 +82,6 @@ export function RouteDetailModal({ route, onClose }: Props) {
           {[
             { Icon: Layers,   label: 'Pitches',  value: `${route.pitches} pitch${route.pitches !== 1 ? 'es' : ''}` },
             { Icon: MapPin,   label: 'Height',   value: route.height },
-            { Icon: Clock,    label: 'Approach', value: route.approach },
             { Icon: MapPin,   label: 'Area',     value: route.area },
           ].map(({ Icon, label, value }) => (
             <div key={label} className="bg-surface-secondary dark:bg-gray-800 rounded-2xl p-4">
