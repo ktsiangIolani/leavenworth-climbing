@@ -33,14 +33,38 @@ L.Icon.Default.mergeOptions({
   shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
 })
 
-// Distinct, natural-feeling colors per area
+// Colors grouped by geographic zone (sub-area → zone color)
 const AREA_COLORS: Record<string, string> = {
-  'Peshastin Pinnacles': '#99B898',
-  'Castle Rock':         '#E84A5F',
-  'Icicle Canyon':       '#FF847C',
-  'Snow Creek Wall':     '#2A363B',
-  "Barney's Rubble":     '#FECEAB',
+  // Icicle Canyon — lower/mid Icicle Road
+  'Trundle Dome':    '#FF6B35',
+  '30 Rock':         '#FF6B35',
+  'Alphabet Rock':   '#FF6B35',
+  // Snow Creek — upper Icicle / Snow Creek
+  'Bathtub Dome':    '#10B981',
+  'Eight Mile Rock': '#10B981',
+  'Pearly Gates':    '#10B981',
+  // Sport Domes — Secret & Bacon Gully corridor
+  'Secret Dome':     '#8B5CF6',
+  'Bacon Gully':     '#8B5CF6',
+  // Tumwater Canyon — Hwy 2 canyon crags
+  'Rattlesnake Rock':'#EF4444',
+  'Hobo Gulch':      '#EF4444',
+  // Clem's Holler — west Leavenworth
+  "Clem's Holler":   '#F59E0B',
+  // Index / Skykomish day trip
+  'Beetle Bailey Slab': '#06B6D4',
+  'Inner Walls':     '#06B6D4',
 }
+
+// Legend entries: one row per zone
+const ZONE_LEGEND = [
+  { label: 'Icicle Canyon',   color: '#FF6B35' },
+  { label: 'Snow Creek',      color: '#10B981' },
+  { label: 'Sport Domes',     color: '#8B5CF6' },
+  { label: 'Tumwater Canyon', color: '#EF4444' },
+  { label: "Clem's Holler",   color: '#F59E0B' },
+  { label: 'Index',           color: '#06B6D4' },
+]
 
 function FlyAndFocus({
   route,
@@ -117,7 +141,6 @@ export function RouteMap({ routes, onRouteClick, focusRoute }: Props) {
                 fillColor: color, fillOpacity: 0.95,
                 color: isLight ? '#C4894A' : '#ffffff', weight: 2, opacity: 1,
               }}
-              eventHandlers={{ click: () => onRouteClick(route) }}
             >
               <Popup>
                 <div style={{ minWidth: '170px', fontFamily: 'Inter, sans-serif' }}>
@@ -184,10 +207,10 @@ export function RouteMap({ routes, onRouteClick, focusRoute }: Props) {
           <span className="text-sm leading-none">🏠</span>
           <span className="text-xs font-medium text-secondary">Airbnb</span>
         </div>
-        {Object.entries(AREA_COLORS).map(([area, color]) => (
-          <div key={area} className="flex items-center gap-2 mb-1.5 last:mb-0">
+        {ZONE_LEGEND.map(({ label, color }) => (
+          <div key={label} className="flex items-center gap-2 mb-1.5 last:mb-0">
             <div className="h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ background: color }} />
-            <span className="text-xs font-medium text-secondary">{area}</span>
+            <span className="text-xs font-medium text-secondary">{label}</span>
           </div>
         ))}
       </div>

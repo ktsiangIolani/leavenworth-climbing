@@ -5,8 +5,8 @@ import type { NavTab } from '../../types'
 
 const TABS: Array<{ tab: NavTab; label: string; Icon: typeof Home }> = [
   { tab: 'home',     label: 'Home',     Icon: Home },
-  { tab: 'schedule', label: 'Schedule', Icon: Calendar },
   { tab: 'routes',   label: 'Routes',   Icon: Mountain },
+  { tab: 'schedule', label: 'Schedule', Icon: Calendar },
 ]
 
 export function BottomNav() {
